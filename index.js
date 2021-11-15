@@ -19,6 +19,8 @@ async function run() {
         const database = client.db('Nima');
         const nimaCollection = database.collection('toys');
         const orderCollection = database.collection('orders');
+        const reviewCollection = database.collection('reviews');
+        const userCollection = database.collection('users');
 
         app.get('/toys', async (req, res) => {
             const cursor = nimaCollection.find({});
@@ -30,6 +32,16 @@ async function run() {
             const orders = await cursor.toArray();
             res.send(orders)
         })
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const reviews = await cursor.toArray();
+            res.send(reviews)
+        })
+        app.get('/users', async (req, res) => {
+            const cursor = userCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users)
+        })
         app.post('/toys', async (req, res) => {
             const toy = req.body;
             const result = await nimaCollection.insertOne(toy);
@@ -39,6 +51,23 @@ async function run() {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.json(result)
+        })
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.json(result)
+        })
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
+            res.json(result)
+        })
+
+        app.delete('/toys/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await nimaCollection.deleteOne(query);
+            res.json(result);
         })
         app.delete('/all_orders/:id', async (req, res) => {
             const id = req.params.id;
