@@ -42,6 +42,16 @@ async function run() {
             const users = await cursor.toArray();
             res.send(users)
         })
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await userCollection.findOne(query);
+            let isAdmin = false;
+            if(user?.role === 'admin'){
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        })
         app.post('/toys', async (req, res) => {
             const toy = req.body;
             const result = await nimaCollection.insertOne(toy);
@@ -62,7 +72,13 @@ async function run() {
             const result = await userCollection.insertOne(user);
             res.json(result)
         })
-
+        app.put('/users/admin', async (req, res ) => {
+            const user = req.body;
+            const filter = { email: user.email};
+            const upadateDoc = {$set: {role : 'admin'}}
+            const result = await userCollection.updateOne(filter, upadateDoc)
+            res.json(result);
+        })
         app.delete('/toys/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: ObjectId(id)};
